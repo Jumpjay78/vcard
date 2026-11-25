@@ -3,18 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visitenkarte / Name Card</title>
+  <title>Visitenkarte/Name Card</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 40px 20px; background: #f4f4f9; }
+    body { font-family: sans-serif; text-align: center; padding: 30px 20px; background: #f4f4f9; color: #333; }
     .card { background: white; padding: 30px; border-radius: 16px; max-width: 400px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .btn { display: block; background: #007bff; color: white; text-decoration: none; padding: 16px; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 20px; }
+    .wechat-box { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+    .wechat-box img { width: 180px; height: 180px; border-radius: 8px; margin-top: 10px; }
+    .wechat-id { font-size: 14px; color: #666; margin-top: 8px; }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Mr. Jens-Peter Lehmann</h2>
-    <p>Classic Line GmbH/ Geschäftsführer/CEO</p>
+    <h2>Jens-PeterLehmann</h2>
+    <p>Classic LineGmbH/ Geschäftsführer/ManagingDirector</p>
+    
     <a class="btn" href="me.vcf">Kontakt speichern / Save Contact</a>
+
+    <div class="wechat-box">
+      <strong>WeChat</strong>
+      <br>
+      <img src="wechat.jpg" alt="WeChat QR Code">
+      <div class="wechat-id">WeChat ID: DEINE_WECHAT_ID</div>
+    </div>
   </div>
 </body>
 </html>
