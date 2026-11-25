@@ -1,162 +1,59 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visitenkarte</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; margin: 0; overflow-x: hidden; }
-    .scene { width: 100%; max-width: 400px; height: 460px; margin: 15px auto; perspective: 1000px; }
-    .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; }
-    .card.is-flipped { transform: rotateY(180deg); }
-    .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: white; border-radius: 18px; padding: 25px 20px; box-sizing: border-box; box-shadow: 0 8px 25px rgba(0,0,0,0.09); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-    .card-back { transform: rotateY(180deg); }
-    .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.75) 0%, rgba(255,140,60,0.16) 40%, transparent 75%); opacity: 0.7; z-index: 10; }
-    .greeting { font-size: 13px; color: #ff6600; font-weight: bold; text-transform: uppercase; }
-    h2 { margin: 5px 0; font-size: 24px; }
-    .subtitle { margin: 0; color: #666; font-size: 15px; }
-    .status-badge { display: inline-block; background: #fff3eb; color: #cc5200; border: 1px solid #ffd6ba; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin: 12px auto; }
-    .btn-primary { display: block; background: #ff6600; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-size: 17px; font-weight: bold; cursor: pointer; position: relative; z-index: 20; }
-    .btn-secondary { display: block; background: #f8f8fa; color: #444; text-decoration: none; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 600; margin-top: 10px; border: 1px solid #e5e5ea; position: relative; z-index: 20; }
-    .flip-btn { background: #f0f0f5; color: #555; border: none; padding: 10px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-top: 10px; font-weight: bold; width: 100%; position: relative; z-index: 20; }
-    .wechat-img { width: 190px; height: 190px; border-radius: 10px; margin: 8px auto; object-fit: contain; }
-    .copy-box { background: #f4f4f9; padding: 10px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; display: inline-block; border: 1px dashed #ccc; position: relative; z-index: 20; }
-    #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>partytime</title>
+<style>
+body{font-family:sans-serif;text-align:center;padding:15px;background:#f4f4f9;color:#333;margin:0;overflow-x:hidden}
+.sc{width:100%;max-width:400px;height:550px;margin:10px auto;perspective:1000px}
+.cd{width:100%;height:100%;position:relative;transition:transform .6s;transform-style:preserve-3d}
+.cd.fl{transform:rotateY(180deg)}
+.cf{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;border-radius:18px;padding:20px;box-sizing:border-box;box-shadow:0 8px 25px rgba(0,0,0,.09);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.cb{transform:rotateY(180deg)}
+.gl{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.75) 0%,rgba(255,140,60,.16) 40%,transparent 75%);opacity:.7;z-index:10}
+.lg{max-height:36px;max-width:150px;margin:0 auto 8px;object-fit:contain;display:block}
+.av{width:84px;height:84px;border-radius:50%;object-fit:cover;border:3px solid #ff6600;margin:0 auto 8px;display:block}
+.gr{font-size:12px;color:#ff6600;font-weight:700;text-transform:uppercase}
+h2{margin:3px 0;font-size:22px}
+.sb{margin:0;color:#666;font-size:14px}
+.st{display:inline-block;background:#fff3eb;color:#cc5200;border:1px solid #ffd6ba;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;margin:10px auto 4px}
+.bp{display:block;background:#ff6600;color:#fff;text-decoration:none;padding:14px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;position:relative;z-index:20}
+.br{display:flex;gap:8px;margin-top:8px;position:relative;z-index:20}
+.bh{flex:1;background:#f8f8fa;color:#333;text-decoration:none;padding:10px 6px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid #e5e5ea;display:flex;align-items:center;justify-content:center}
+.bl{background:#eef5fc;color:#0a66c2;border-color:#cde0f5}
+.fb{background:#f0f0f5;color:#555;border:none;padding:10px;border-radius:20px;font-size:13px;cursor:pointer;margin-top:8px;font-weight:700;width:100%;position:relative;z-index:20}
+.wi{width:200px;height:200px;border-radius:10px;margin:10px auto;object-fit:contain}
+.cx{background:#f4f4f9;padding:10px 14px;border-radius:10px;font-size:14px;cursor:pointer;display:inline-block;border:1px dashed #ccc;position:relative;z-index:20}
+#cn{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999}
+</style>
 </head>
 <body>
-  <canvas id="confetti"></canvas>
-  <div class="scene">
-    <div class="card" id="card">
-      <div class="card-face card-front">
-        <div class="glare" id="glare-front"></div>
-        <div>
-          <div id="txt-greeting" class="greeting">Hallo!</div>
-          <h2 id="user-name">DEIN NAME</h2>
-          <p id="user-role" class="subtitle">DEINE FIRMA / POSITION</p>
-          <div id="live-status" class="status-badge">Status wird geladen...</div>
-        </div>
-        <div>
-          <a id="btn-save" class="btn-primary" href="me.vcf" onclick="return celebrate(event)">Kontakt speichern</a>
-          <a id="btn-meet" class="btn-secondary" href="#">📍 Treffpunkt-Notiz senden</a>
-          <button id="btn-flip-front" class="flip-btn" onclick="flipCard()">📱 Schütteln oder tippen für WeChat ↻</button>
-        </div>
-      </div>
-      <div class="card-face card-back">
-        <div class="glare" id="glare-back"></div>
-        <div>
-          <h3 style="margin: 5px 0;">WeChat Connect</h3>
-          <img id="wechat-qr" class="wechat-img" src="wechat.jpg" alt="WeChat QR Code"><br>
-          <div class="copy-box" onclick="copyWeChat()">
-            WeChat ID: <strong id="wechat-id-text">DEINE_WECHAT_ID</strong> 📋
-            <div id="copy-feedback" style="font-size: 12px; color: #2e7d32;"></div>
-          </div>
-        </div>
-        <button id="btn-flip-back" class="flip-btn" onclick="flipCard()">↺ Zurück zur Visitenkarte</button>
-      </div>
-    </div>
-  </div>
-  <script>
-    const CONFIG = {
-      name: "Jens-Peter Lehmann",
-      role: "Classic Line GmbH / Geschäftsführer",
-      email: "jens@classicline-gmbh.de",
-      wechatId: "Jumpjay78",
-      wechatImage: "WeChat.jpg"
-    };
-
-    document.getElementById('user-name').innerText = CONFIG.name;
-    document.getElementById('user-role').innerText = CONFIG.role;
-    document.getElementById('wechat-id-text').innerText = CONFIG.wechatId;
-    document.getElementById('wechat-qr').src = CONFIG.wechatImage;
-
-    const ul = (navigator.language || 'en').toLowerCase();
-    const lang = ul.startsWith('zh') ? 'zh' : (ul.startsWith('de') ? 'de' : 'en');
-    const I18N = {
-      de: { g: "Schön, dass wir uns vernetzen!", s: "Kontakt speichern", sd: "✅ Gespeichert!", m: "📍 Treffpunkt-Notiz senden", ff: "📱 Schütteln oder tippen für WeChat ↻", fb: "↺ Zurück", cp: "✅ Kopiert!", st: ["☕ Wach & bereit", "🍜 Mittagspause", "🚀 Im Arbeitsmodus", "🍻 Feierabend", "😴 Schläft (WeChat!)"] },
-      zh: { g: "你好! 很高兴认识你", s: "保存联系人", sd: "✅ 已保存!", m: "📍 发送邮件交换联系方式", ff: "📱 摇一摇或点击查看微信 ↻", fb: "↺ 返回", cp: "✅ 已复制!", st: ["☕ 精神饱满", "🍜 午休时间", "🚀 工作中", "🍻 下班时间", "😴 休息中 (请发微信!)"] },
-      en: { g: "Great to connect with you!", s: "Save Contact", sd: "✅ Saved!", m: "📍 Send 'Nice meeting you' note", ff: "📱 Shake or tap for WeChat ↻", fb: "↺ Back", cp: "✅ Copied!", st: ["☕ Awake & ready", "🍜 Lunch break", "🚀 Working", "🍻 Evening mode", "😴 Sleeping (Use WeChat!)"] }
-    };
-
-    const t = I18N[lang];
-    document.getElementById('txt-greeting').innerText = t.g;
-    document.getElementById('btn-save').innerText = t.s;
-    document.getElementById('btn-meet').innerText = t.m;
-    document.getElementById('btn-meet').href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent("Kontakt: " + CONFIG.name);
-    document.getElementById('btn-flip-front').innerText = t.ff;
-    document.getElementById('btn-flip-back').innerText = t.fb;
-
-    function updateStatus() {
-      const now = new Date();
-      const ts = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' }).format(now);
-      const h = parseInt(new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: 'numeric', hour12: false }).format(now), 10);
-      const i = (h >= 8 && h < 12) ? 0 : (h >= 12 && h < 14) ? 1 : (h >= 14 && h < 18) ? 2 : (h >= 18 && h < 22) ? 3 : 4;
-      document.getElementById('live-status').innerText = ts + " (DE) – " + t.st[i];
-    }
-    updateStatus();
-    setInterval(updateStatus, 60000);
-
-    function copyWeChat() {
-      navigator.clipboard.writeText(CONFIG.wechatId);
-      document.getElementById('copy-feedback').innerText = t.cp;
-      setTimeout(() => { document.getElementById('copy-feedback').innerText = ""; }, 2000);
-    }
-
-    const card = document.getElementById('card');
-    let lastShake = 0;
-    function flipCard() {
-      card.classList.toggle('is-flipped');
-      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') DeviceMotionEvent.requestPermission().catch(() => {});
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') DeviceOrientationEvent.requestPermission().catch(() => {});
-    }
-
-    window.addEventListener('devicemotion', e => {
-      const a = e.accelerationIncludingGravity;
-      if (a && (Math.abs(a.x) + Math.abs(a.y) + Math.abs(a.z)) > 32 && (Date.now() - lastShake) > 1200) {
-        lastShake = Date.now();
-        card.classList.toggle('is-flipped');
-      }
-    });
-
-    function setGlare(x, y) {
-      const bg = "radial-gradient(circle at " + x + "% " + y + "%, rgba(255,255,255,0.85) 0%, rgba(255,140,60,0.18) 40%, transparent 75%)";
-      document.getElementById('glare-front').style.background = bg;
-      document.getElementById('glare-back').style.background = bg;
-    }
-
-    window.addEventListener('deviceorientation', e => {
-      if (e.gamma !== null && e.beta !== null) {
-        setGlare(Math.min(100, Math.max(0, 50 + e.gamma * 1.5)), Math.min(100, Math.max(0, 50 + (e.beta - 45) * 1.5)));
-      }
-    });
-
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      setGlare(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
-    });
-
-    function celebrate(e) {
-      e.preventDefault();
-      const b = document.getElementById('btn-save');
-      b.innerText = t.sd;
-      setTimeout(() => { b.innerText = t.s; }, 3000);
-      const c = document.getElementById('confetti');
-      const ctx = c.getContext('2d');
-      c.width = window.innerWidth;
-      c.height = window.innerHeight;
-      const cols = ['#ff6600', '#ff944d', '#ffd6ba', '#333333'];
-      const pts = Array.from({ length: 60 }, () => ({ x: Math.random() * c.width, y: Math.random() * -c.height, s: Math.random() * 7 + 4, v: Math.random() * 4 + 3, col: cols[Math.floor(Math.random() * cols.length)] }));
-      let f = 0;
-      function loop() {
-        ctx.clearRect(0, 0, c.width, c.height);
-        pts.forEach(p => { ctx.fillStyle = p.col; ctx.fillRect(p.x, p.y, p.s, p.s); p.y += p.v; });
-        if (++f < 90) requestAnimationFrame(loop);
-        else ctx.clearRect(0, 0, c.width, c.height);
-      }
-      loop();
-      setTimeout(() => { window.location.href = 'me.vcf'; }, 400);
-      return false;
-    }
-  </script>
+<canvas id="cn"></canvas>
+<div class="sc"><div class="cd" id="cd">
+<div class="cf"><div class="gl" id="g1"></div>
+<div><img id="l1" class="lg" src="logo.png"><img id="av" class="av" src="profil.jpg"><div id="gr" class="gr">Hallo!</div><h2 id="nm"></h2><p id="rl" class="sb"></p><div id="st" class="st">...</div></div>
+<div><a id="bs" class="bp" href="me.vcf" onclick="return cel(event)"></a><div class="br"><a id="li" class="bh bl" href="#" target="_blank">in LinkedIn</a><a id="mt" class="bh" href="#"></a></div><button id="f1" class="fb" onclick="flp()"></button></div>
+</div>
+<div class="cf cb"><div class="gl" id="g2"></div>
+<div><img id="l2" class="lg" src="logo.png"><h3 style="margin:5px 0">WeChat Connect</h3><img id="wq" class="wi" src="wechat.jpg"><br><div class="cx" onclick="cpw()">WeChat ID: <strong id="wi"></strong> 📋<div id="cf" style="font-size:12px;color:#2e7d32"></div></div></div>
+<button id="f2" class="fb" onclick="flp()"></button>
+</div>
+</div></div>
+<script>
+const C={name:"Jens-Peter Lehmann",role:"Geschäftsführer @ Classic Line GmbH",email:"jens@classicline-gmbh.de",li:"https://www.linkedin.com/in/jens-peter-lehmann-aba083258?utm_source=share_via&utm_content=profile&utm_medium=member_android",av:"profil.jpg",lg:"logo.jpg",wid:"Jumpjay78",wimg:"WeChat.jpg"};
+document.getElementById('nm').innerText=C.name;document.getElementById('rl').innerText=C.role;document.getElementById('av').src=C.av;document.getElementById('l1').src=C.lg;document.getElementById('l2').src=C.lg;document.getElementById('li').href=C.li;document.getElementById('wi').innerText=C.wid;document.getElementById('wq').src=C.wimg;
+const u=(navigator.language||'en').toLowerCase(),l=u.startsWith('zh')?'zh':(u.startsWith('de')?'de':'en');
+const T={de:{g:"Schön, dass wir uns vernetzen!",s:"Kontakt speichern",d:"✅ Gespeichert!",m:"📍 Notiz",a:"📱 Schütteln/Tippen für WeChat ↻",b:"↺ Zurück",c:"✅ Kopiert!",t:["☕ Wach & bereit","🍜 Mittagspause","🚀 Arbeitsmodus","🍻 Feierabend","😴 Schläft (WeChat!)"]},zh:{g:"你好! 很高兴认识你",s:"保存联系人",d:"✅ 已保存!",m:"📍 邮件联系",a:"📱 摇一摇或点击查看微信 ↻",b:"↺ 返回",c:"✅ 已复制!",t:["☕ 精神饱满","🍜 午休时间","🚀 工作中","🍻 下班时间","😴 休息中 (发微信!)"]},en:{g:"Great to connect!",s:"Save Contact",d:"✅ Saved!",m:"📍 Note",a:"📱 Shake/Tap for WeChat ↻",b:"↺ Back",c:"✅ Copied!",t:["☕ Awake & ready","🍜 Lunch break","🚀 Working","🍻 Evening mode","😴 Sleeping (WeChat!)"]}}[l];
+document.getElementById('gr').innerText=T.g;document.getElementById('bs').innerText=T.s;document.getElementById('mt').innerText=T.m;document.getElementById('mt').href="mailto:"+C.email+"?subject="+encodeURIComponent("Kontakt: "+C.name);document.getElementById('f1').innerText=T.a;document.getElementById('f2').innerText=T.b;
+function up(){const n=new Date(),ts=new Intl.DateTimeFormat('de-DE',{timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit'}).format(n),h=parseInt(new Intl.DateTimeFormat('de-DE',{timeZone:'Europe/Berlin',hour:'numeric',hour12:false}).format(n),10),i=h>=8&&h<12?0:h>=12&&h<14?1:h>=14&&h<18?2:h>=18&&h<22?3:4;document.getElementById('st').innerText=ts+" (DE) – "+T.t[i]}up();setInterval(up,60000);
+function cpw(){navigator.clipboard.writeText(C.wid);document.getElementById('cf').innerText=T.c;setTimeout(()=>document.getElementById('cf').innerText="",2000)}
+const cd=document.getElementById('cd');let ls=0;
+function flp(){cd.classList.toggle('fl');if(typeof DeviceMotionEvent!=='undefined'&&DeviceMotionEvent.requestPermission)DeviceMotionEvent.requestPermission().catch(()=>{});if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission)DeviceOrientationEvent.requestPermission().catch(()=>{})}
+window.addEventListener('devicemotion',e=>{const a=e.accelerationIncludingGravity;if(a&&Math.abs(a.x)+Math.abs(a.y)+Math.abs(a.z)>32&&Date.now()-ls>1200){ls=Date.now();cd.classList.toggle('fl')}});
+function gl(x,y){const b="radial-gradient(circle at "+x+"% "+y+"%,rgba(255,255,255,.85) 0%,rgba(255,140,60,.18) 40%,transparent 75%)";document.getElementById('g1').style.background=b;document.getElementById('g2').style.background=b}
+window.addEventListener('deviceorientation',e=>{if(e.gamma!==null)gl(Math.min(100,Math.max(0,50+e.gamma*1.5)),Math.min(100,Math.max(0,50+(e.beta-45)*1.5)))});
+function cel(e){e.preventDefault();const b=document.getElementById('bs');b.innerText=T.d;setTimeout(()=>b.innerText=T.s,3000);const c=document.getElementById('cn'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const cl=['#ff6600','#ff944d','#ffd6ba','#333'],p=Array.from({length:50},()=>({x:Math.random()*c.width,y:Math.random()*-c.height,s:Math.random()*7+4,v:Math.random()*4+3,c:cl[Math.floor(Math.random()*4)]}));let f=0;function lp(){x.clearRect(0,0,c.width,c.height);p.forEach(o=>{x.fillStyle=o.c;x.fillRect(o.x,o.y,o.s,o.s);o.y+=o.v});if(++f<85)requestAnimationFrame(lp);else x.clearRect(0,0,c.width,c.height)}lp();setTimeout(()=>location.href='me.vcf',400);return false}
+</script>
 </body>
 </html>
