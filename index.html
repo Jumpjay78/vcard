@@ -3,29 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visitenkarte/Name Card</title>
+  <title>Visitenkarte / Name Card</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 30px 20px; background: #ff6600; color: #333; }
-    .card { background: white; padding: 30px; border-radius: 16px; max-width: 400px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .btn { display: block; background: #007bff; color: white; text-decoration: none; padding: 16px; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 20px; }
-    .wechat-box { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
-    .wechat-box img { width: 180px; height: 180px; border-radius: 8px; margin-top: 10px; }
-    .wechat-id { font-size: 14px; color: #666; margin-top: 8px; }
+    body { font-family: sans-serif; text-align: center; padding: 30px 20px; background: #f4f4f9; color: #333; margin: 0; }
+    .scene { width: 100%; max-width: 400px; height: 420px; margin: 20px auto; perspective: 1000px; }
+    .card { width: 100%;height: 100%; position: relative; transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+    .card.is-flipped { transform: rotateY(180deg); }
+    .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: white; border-radius: 16px; padding: 30px 25px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
+    .card-back { transform: rotateY(180deg); }
+    .status-badge { display: inline-block; background: #fff3eb; color: #cc5200; border: 1px solid #ffd6ba; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin: 10px auto; }
+    .btn { display: block; background: #ff6600; color: white; text-decoration: none; padding: 16px; border-radius: 10px; font-size: 17px; font-weight: bold; margin-top: 15px; box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3); }
+    .flip-btn { background: #f0f0f5; color: #555; border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-top: 15px; font-weight: bold; }
+    .wechat-img { width: 190px; height: 190px; border-radius: 8px; margin: 10px auto; object-fit: contain; }
+    .wechat-id { font-size: 14px; color: #666; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Jens-Peter Lehmann</h2>
-    <p>Classic Line GmbH/ Geschäftsführer/ManagingDirector</p>
-    
-    <a class="btn" href="me.vcf">Kontakt speichern / Save Contact</a>
 
-    <div class="wechat-box">
-      <strong>WeChat</strong>
-      <br>
-      <img src="WeChat.jpg" alt="WeChat QR Code">
-      <div class="wechat-id">WeChat ID: Jumpjay78</div>
+  <div class="scene">
+    <div class="card" id="card">
+      
+      <!-- VORDERSEITE -->
+      <div class="card-face card-front">
+        <div>
+          <h2 style="margin: 10px 0 5px 0;">Jens-Peter Lehmann/h2>
+          <p style="margin: 0; color: #666;">Classic Line GmbH / Geschäftsführer / Managing Director</p>
+          <div id="live-status" class="status-badge">Lade Status...</div>
+        </div>
+
+        <div>
+          <a class="btn" href="me.vcf">Kontakt speichern / Save Contact</a>
+          <button class="flip-btn" onclick="flipCard()">📱 Schütteln oder tippen für WeChat ↻</button>
+        </div>
+      </div>
+
+      <!-- RÜCKSEITE (WECHAT) -->
+      <div class="card-face card-back">
+        <div>
+          <h3 style="margin: 5px 0;">WeChat Connect</h3>
+          
+          <img class="wechat-img" src="WeChat.jpg" alt="WeChat QR Code">
+          <div class="wechat-id">WeChat ID: <strong>Jumpjay78</strong></div>
+        </div>
+
+        <div>
+          <button class="flip-btn" onclick="flipCard()">↺ Zurück zur Visitenkarte</button>
+        </div>
+      </div>
+
     </div>
   </div>
+
+  <script>
+    // 1. Live-Status berechnen
+    function updateStatus() {
+      const now = new Date();
+      const optionsTime = { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' };
+      const optionsHour = { timeZone: 'Europe/Berlin', hour: 'numeric', hour12: false };
+      
+      const timeStr = new Intl.DateTimeFormat('de-DE', optionsTime).format(now);
+      const hour = parseInt(new Intl.DateTimeFormat('de-DE', optionsHour).format(now), 10);
+
+      let statusText = "";
+      if (hour >= 8 && hour < 12) {
+        statusText = `☕ ${timeStr} (DE) – Wach & bereit für Projekte`;
+      } else if (hour >= 12 && hour < 14) {
+        statusText = `🍜 ${timeStr} (DE) – Mittagspause, aber erreichbar`;
+      } else if (hour >= 14 && hour < 18) {
+        statusText = `🚀 ${timeStr} (DE) – Im Arbeitsmodus`;
+      } else if (hour >= 18 && hour < 22) {
+        statusText = `🍻 ${timeStr} (DE) – Feierabend-Modus`;
+      } else {
+        statusText = `😴 ${timeStr} (DE) – Schläft wahrscheinlich (WeChat!)`;
+      }
+      document.getElementById('live-status').innerText = statusText;
+    }
+    updateStatus();
+    setInterval(updateStatus, 60000);
+
+    // 2. Karte umdrehen (Klick & Shake)
+    const card = document.getElementById('card');
+    let lastShake = 0;
+
+    function flipCard() {
+      card.classList.toggle('is-flipped');
+      // iOS 13+ Berechtigung für Bewegungssensor beim ersten Klick anfragen
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission().catch(() => {});
+      }
+    }
+
+    // Schüttel-Erkennung (Shake)
+    window.addEventListener('devicemotion', function(event) {
+      const acc = event.accelerationIncludingGravity;
+      if (!acc) return;
+      const totalAcc = Math.abs(acc.x) + Math.abs(acc.y) + Math.abs(acc.z);
+      const now = Date.now();
+      
+      if (totalAcc > 32 && (now - lastShake) > 1200) {
+        lastShake = now;
+        card.classList.toggle('is-flipped');
+      }
+    });
+  </script>
+
 </body>
 </html>
