@@ -5,237 +5,119 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visitenkarte</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; margin: 0; overflow-x: hidden; }
-    .scene { width: 100%; max-width: 400px; height: 470px; margin: 15px auto; perspective: 1000px; }
-    .card { width: 100%; height: 100%; position: relative; transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; margin: 0; }
+    .scene { width: 100%; max-width: 400px; height: 460px; margin: 15px auto; perspective: 1000px; }
+    .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; }
     .card.is-flipped { transform: rotateY(180deg); }
-    .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: white; border-radius: 18px; padding: 28px 22px; box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
+    .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: white; border-radius: 18px; padding: 25px 20px; box-sizing: border-box; box-shadow: 0 6px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
     .card-back { transform: rotateY(180deg); }
-    .greeting { font-size: 13px; color: #ff6600; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-    h2 { margin: 4px 0; font-size: 24px; }
+    .greeting { font-size: 13px; color: #ff6600; font-weight: bold; text-transform: uppercase; }
+    h2 { margin: 5px 0; font-size: 24px; }
     .subtitle { margin: 0; color: #666; font-size: 15px; }
-    .status-badge { display: inline-block; background: #fff3eb; color: #cc5200; border: 1px solid #ffd6ba; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin: 14px auto 4px auto; }
-    .btn-primary { display: block; background: #ff6600; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-size: 17px; font-weight: bold; box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3); transition: transform 0.1s; }
-    .btn-primary:active { transform: scale(0.98); }
+    .status-badge { display: inline-block; background: #fff3eb; color: #cc5200; border: 1px solid #ffd6ba; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin: 12px auto; }
+    .btn-primary { display: block; background: #ff6600; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-size: 17px; font-weight: bold; }
     .btn-secondary { display: block; background: #f8f8fa; color: #444; text-decoration: none; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 600; margin-top: 10px; border: 1px solid #e5e5ea; }
-    .flip-btn { background: #f0f0f5; color: #555; border: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-top: 12px; font-weight: bold; width: 100%; }
-    .wechat-img { width: 195px; height: 195px; border-radius: 10px; margin: 8px auto; object-fit: contain; border: 1px solid #eee; padding: 4px; }
-    .copy-box { background: #f4f4f9; padding: 10px 14px; border-radius: 10px; font-size: 14px; color: #333; cursor: pointer; display: inline-block; margin-top: 6px; border: 1px dashed #ccc; }
-    .copy-box:active { background: #e8f5e9; border-color: #4caf50; }
-    #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+    .flip-btn { background: #f0f0f5; color: #555; border: none; padding: 10px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-top: 10px; font-weight: bold; width: 100%; }
+    .wechat-img { width: 190px; height: 190px; border-radius: 10px; margin: 8px auto; object-fit: contain; }
+    .copy-box { background: #f4f4f9; padding: 10px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; display: inline-block; border: 1px dashed #ccc; }
   </style>
 </head>
 <body>
-
-  <canvas id="confetti-canvas"></canvas>
-
   <div class="scene">
     <div class="card" id="card">
-      
-      <!-- VORDERSEITE -->
       <div class="card-face card-front">
         <div>
           <div id="txt-greeting" class="greeting">Hallo!</div>
           <h2 id="user-name">DEIN NAME</h2>
           <p id="user-role" class="subtitle">DEINE FIRMA / POSITION</p>
-          <div id="live-status" class="status-badge">...</div>
+          <div id="live-status" class="status-badge">Status wird geladen...</div>
         </div>
-
         <div>
           <a id="btn-save" class="btn-primary" href="me.vcf" onclick="celebrate()">Kontakt speichern</a>
           <a id="btn-meet" class="btn-secondary" href="#">📍 Treffpunkt-Notiz senden</a>
           <button id="btn-flip-front" class="flip-btn" onclick="flipCard()">📱 Schütteln oder tippen für WeChat ↻</button>
         </div>
       </div>
-
-      <!-- RÜCKSEITE (WECHAT) -->
       <div class="card-face card-back">
         <div>
-          <h3 style="margin: 4px 0;">WeChat Connect</h3>
-          <img id="wechat-qr" class="wechat-img" src="wechat.jpg" alt="WeChat QR Code">
-          <br>
+          <h3 style="margin: 5px 0;">WeChat Connect</h3>
+          <img id="wechat-qr" class="wechat-img" src="wechat.jpg" alt="WeChat QR Code"><br>
           <div class="copy-box" onclick="copyWeChat()">
             WeChat ID: <strong id="wechat-id-text">DEINE_WECHAT_ID</strong> 📋
-            <div id="copy-feedback" style="font-size: 12px; color: #2e7d32; margin-top: 2px;"></div>
+            <div id="copy-feedback" style="font-size: 12px; color: #2e7d32;"></div>
           </div>
         </div>
-
-        <div>
-          <button id="btn-flip-back" class="flip-btn" onclick="flipCard()">↺ Zurück zur Visitenkarte</button>
-        </div>
+        <button id="btn-flip-back" class="flip-btn" onclick="flipCard()">↺ Zurück zur Visitenkarte</button>
       </div>
-
     </div>
   </div>
 
   <script>
-    // ==========================================
-    // HIER DEINE PERSÖNLICHEN DATEN EINTRAGEN:
-    // ==========================================
     const CONFIG = {
-      name: "Jens-PeterLehmann",
-      role: "Classic LineGmbH / Geschäftsführer",
-      email: "jens@classicline-gmbh.de",       // Für den "Treffpunkt-Notiz"-Button
-      wechatId: "Jumpjay78",            // Deine WeChat ID
-      wechatImage: "WeChat.jpg"               // Exakter Dateiname deines QR-Codes auf GitHub
+      name: "Jens-Peter Lehmann",
+      role: "Classic Line GmbH / Geschäftsführer",
+      email: "jens@classicline-gmbh.de",
+      wechatId: "Jumpjay78",
+      wechatImage: "WeChat.jpg"
     };
-    // ==========================================
 
     document.getElementById('user-name').innerText = CONFIG.name;
     document.getElementById('user-role').innerText = CONFIG.role;
     document.getElementById('wechat-id-text').innerText = CONFIG.wechatId;
     document.getElementById('wechat-qr').src = CONFIG.wechatImage;
 
-    // 1. Automatische Spracherkennung (DE / ZH / EN)
-    const userLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
-    let lang = 'en';
-    if (userLang.startsWith('de')) lang = 'de';
-    else if (userLang.startsWith('zh')) lang = 'zh';
-
+    const lang = (navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : ((navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' : 'en');
     const I18N = {
-      de: {
-        greeting: "Schön, dass wir uns vernetzen!",
-        save: "Kontakt speichern",
-        saved: "✅ Gespeichert! Bis bald!",
-        meet: "📍 Treffpunkt-Notiz zurücksenden",
-        mailSubj: `Schön dich kennenzulernen, ${CONFIG.name}!`,
-        mailBody: `Hallo ${CONFIG.name},\n\nwir haben uns gerade per NFC-Visitenkarte vernetzt. Hier sind auch meine Kontaktdaten:\n\nName: \nFirma: \nTelefon: \n\nViele Grüße`,
-        flipFront: "📱 Schütteln oder tippen für WeChat ↻",
-        flipBack: "↺ Zurück zur Visitenkarte",
-        copied: "✅ In Zwischenablage kopiert!",
-        status: {
-          morning: (t) => `☕ ${t} (DE) – Wach & bereit für Projekte`,
-          lunch: (t) => `🍜 ${t} (DE) – Mittagspause, aber erreichbar`,
-          work: (t) => `🚀 ${t} (DE) – Im Arbeitsmodus`,
-          evening: (t) => `🍻 ${t} (DE) – Feierabend-Modus`,
-          night: (t) => `😴 ${t} (DE) – Schläft wahrscheinlich (WeChat!)`
-        }
-      },
-      zh: {
-        greeting: "你好! 很高兴认识你",
-        save: "保存联系人 (Save Contact)",
-        saved: "✅ 已保存! 保持联系!",
-        meet: "📍 发送邮件交换联系方式",
-        mailSubj: `很高兴认识你, ${CONFIG.name}!`,
-        mailBody: `你好 ${CONFIG.name},\n\n我们刚刚通过NFC名片认识。这是我的联系方式：\n\n姓名：\n公司：\n电话/微信：\n\n祝好！`,
-        flipFront: "📱 摇一摇或点击查看微信二维码 ↻",
-        flipBack: "↺ 返回名片正面",
-        copied: "✅ 微信号已复制!",
-        status: {
-          morning: (t) => `☕ 德国时间 ${t} – 精神饱满，欢迎联系`,
-          lunch: (t) => `🍜 德国时间 ${t} – 午休时间，仍可联系`,
-          work: (t) => `🚀 德国时间 ${t} – 工作中`,
-          evening: (t) => `🍻 德国时间 ${t} – 下班时间`,
-          night: (t) => `😴 德国时间 ${t} – 休息中 (请发微信留言!)`
-        }
-      },
-      en: {
-        greeting: "Great to connect with you!",
-        save: "Save Contact",
-        saved: "✅ Saved! Talk soon!",
-        meet: "📍 Send 'Nice meeting you' note",
-        mailSubj: `Great meeting you, ${CONFIG.name}!`,
-        mailBody: `Hi ${CONFIG.name},\n\nWe just connected via your NFC card. Here are my details too:\n\nName: \nCompany: \nPhone: \n\nBest regards`,
-        flipFront: "📱 Shake or tap for WeChat ↻",
-        flipBack: "↺ Back to contact card",
-        copied: "✅ Copied to clipboard!",
-        status: {
-          morning: (t) => `☕ ${t} (DE) – Awake & ready for projects`,
-          lunch: (t) => `🍜 ${t} (DE) – Lunch break, still reachable`,
-          work: (t) => `🚀 ${t} (DE) – In work mode`,
-          evening: (t) => `🍻 ${t} (DE) – Off work / Evening mode`,
-          night: (t) => `😴 ${t} (DE) – Probably sleeping (Use WeChat!)`
-        }
-      }
+      de: { g: "Schön, dass wir uns vernetzen!", s: "Kontakt speichern", sd: "✅ Gespeichert!", m: "📍 Treffpunkt-Notiz senden", ff: "📱 Schütteln oder tippen für WeChat ↻", fb: "↺ Zurück", cp: "✅ Kopiert!", st: ["☕ Wach & bereit", "🍜 Mittagspause", "🚀 Im Arbeitsmodus", "🍻 Feierabend", "😴 Schläft (WeChat!)"] },
+      zh: { g: "你好! 很高兴认识你", s: "保存联系人", sd: "✅ 已保存!", m: "📍 发送邮件交换联系方式", ff: "📱 摇一摇或点击查看微信 ↻", fb: "↺ 返回", cp: "✅ 已复制!", st: ["☕ 精神饱满", "🍜 午休时间", "🚀 工作中", "🍻 下班时间", "😴 休息中 (请发微信!)"] },
+      en: { g: "Great to connect with you!", s: "Save Contact", sd: "✅ Saved!", m: "📍 Send 'Nice meeting you' note", ff: "📱 Shake or tap for WeChat ↻", fb: "↺ Back", cp: "✅ Copied!", st: ["☕ Awake & ready", "🍜 Lunch break", "🚀 Working", "🍻 Evening mode", "😴 Sleeping (Use WeChat!)"] }
     };
 
     const t = I18N[lang];
-    document.getElementById('txt-greeting').innerText = t.greeting;
-    document.getElementById('btn-save').innerText = t.save;
-    document.getElementById('btn-meet').innerText = t.meet;
-    document.getElementById('btn-meet').href = `mailto:${CONFIG.email}?subject=${encodeURIComponent(t.mailSubj)}&body=${encodeURIComponent(t.mailBody)}`;
-    document.getElementById('btn-flip-front').innerText = t.flipFront;
-    document.getElementById('btn-flip-back').innerText = t.flipBack;
+    document.getElementById('txt-greeting').innerText = t.g;
+    document.getElementById('btn-save').innerText = t.s;
+    document.getElementById('btn-meet').innerText = t.m;
+    document.getElementById('btn-meet').href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent("Kontakt: " + CONFIG.name);
+    document.getElementById('btn-flip-front').innerText = t.ff;
+    document.getElementById('btn-flip-back').innerText = t.fb;
 
-    // 2. Live-Status (Deutsche Ortszeit)
     function updateStatus() {
       const now = new Date();
       const timeStr = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' }).format(now);
-      const hour = parseInt(new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: 'numeric', hour12: false }).format(now), 10);
-
-      let msg = "";
-      if (hour >= 8 && hour < 12) msg = t.status.morning(timeStr);
-      else if (hour >= 12 && hour < 14) msg = t.status.lunch(timeStr);
-      else if (hour >= 14 && hour < 18) msg = t.status.work(timeStr);
-      else if (hour >= 18 && hour < 22) msg = t.status.evening(timeStr);
-      else msg = t.status.night(timeStr);
-
-      document.getElementById('live-status').innerText = msg;
+      const h = parseInt(new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: 'numeric', hour12: false }).format(now), 10);
+      const idx = (h >= 8 && h < 12) ? 0 : (h >= 12 && h < 14) ? 1 : (h >= 14 && h < 18) ? 2 : (h >= 18 && h < 22) ? 3 : 4;
+      document.getElementById('live-status').innerText = timeStr + " (DE) – " + t.st[idx];
     }
     updateStatus();
     setInterval(updateStatus, 60000);
 
-    // 3. WeChat ID kopieren
     function copyWeChat() {
-      navigator.clipboard.writeText(CONFIG.wechatId).then(() => {
-        document.getElementById('copy-feedback').innerText = t.copied;
-        setTimeout(() => { document.getElementById('copy-feedback').innerText = ""; }, 2500);
-      });
+      navigator.clipboard.writeText(CONFIG.wechatId);
+      document.getElementById('copy-feedback').innerText = t.cp;
+      setTimeout(() => { document.getElementById('copy-feedback').innerText = ""; }, 2000);
     }
 
-    // 4. Shake-to-Flip & Klick-Flip
     const card = document.getElementById('card');
     let lastShake = 0;
-
     function flipCard() {
       card.classList.toggle('is-flipped');
       if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceMotionEvent.requestPermission().catch(() => {});
       }
     }
+    window.addEventListener('devicemotion', e => {
+      const a = e.accelerationIncludingGravity;
+      if (a && (Math.abs(a.x) + Math.abs(a.y) + Math.abs(a.z)) > 32 && (Date.now() - lastShake) > 1200) {
+        lastShake = Date.now();
+        card.classList.toggle('is-flipped');
+      }
+    });
 
-    window.addEventListener('devicemotion', function(event) {
-Verwende Code mit Vorsicht.
-const acc = event.accelerationIncludingGravity;
-if (!acc) return;
-const totalAcc = Math.abs(acc.x) + Math.abs(acc.y) + Math.abs(acc.z);
-const now = Date.now();
-if (totalAcc > 32 && (now - lastShake) > 1200) {
-lastShake = now;
-card.classList.toggle('is-flipped');
-}
-});
-// 5. Konfetti-Effekt beim Speichern
-function celebrate() {
-const btn = document.getElementById('btn-save');
-btn.innerText = t.saved;
-setTimeout(() => { btn.innerText = t.save; }, 3500);
-const canvas = document.getElementById('confetti-canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-const colors = ['#ff6600', '#ff944d', '#ffd6ba', '#333333', '#ffffff'];
-const particles = Array.from({ length: 65 }, () => ({
-x: Math.random() * canvas.width,
-y: Math.random() * canvas.height - canvas.height,
-r: Math.random() * 6 + 4,
-d: Math.random() * 65,
-color: colors[Math.floor(Math.random() * colors.length)],
-tilt: Math.random() * 10 - 10
-}));
-let frame = 0;
-function draw() {
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-particles.forEach(p => {
-ctx.beginPath();
-ctx.fillStyle = p.color;
-ctx.fillRect(p.x, p.y, p.r, p.r * 1.4);
-p.y += Math.cos(p.d) + 3;
-p.x += Math.sin(frame * 0.05) * 1.5;
-});
-frame++;
-if (frame < 110) requestAnimationFrame(draw);
-else ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-draw();
-}
+    function celebrate() {
+      const b = document.getElementById('btn-save');
+      b.innerText = t.sd;
+      setTimeout(() => { b.innerText = t.s; }, 3000);
+    }
+  </script>
+</body>
+</html>
