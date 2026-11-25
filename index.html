@@ -5,27 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visitenkarte</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; margin: 0; }
+    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; margin: 0; overflow-x: hidden; }
     .scene { width: 100%; max-width: 400px; height: 460px; margin: 15px auto; perspective: 1000px; }
     .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; }
     .card.is-flipped { transform: rotateY(180deg); }
-    .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: white; border-radius: 18px; padding: 25px 20px; box-sizing: border-box; box-shadow: 0 6px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
+    .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: white; border-radius: 18px; padding: 25px 20px; box-sizing: border-box; box-shadow: 0 8px 25px rgba(0,0,0,0.09); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
     .card-back { transform: rotateY(180deg); }
+    .glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.75) 0%, rgba(255,140,60,0.16) 40%, transparent 75%); opacity: 0.7; z-index: 10; }
     .greeting { font-size: 13px; color: #ff6600; font-weight: bold; text-transform: uppercase; }
     h2 { margin: 5px 0; font-size: 24px; }
     .subtitle { margin: 0; color: #666; font-size: 15px; }
     .status-badge { display: inline-block; background: #fff3eb; color: #cc5200; border: 1px solid #ffd6ba; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin: 12px auto; }
-    .btn-primary { display: block; background: #ff6600; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-size: 17px; font-weight: bold; }
-    .btn-secondary { display: block; background: #f8f8fa; color: #444; text-decoration: none; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 600; margin-top: 10px; border: 1px solid #e5e5ea; }
-    .flip-btn { background: #f0f0f5; color: #555; border: none; padding: 10px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-top: 10px; font-weight: bold; width: 100%; }
+    .btn-primary { display: block; background: #ff6600; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-size: 17px; font-weight: bold; cursor: pointer; position: relative; z-index: 20; }
+    .btn-secondary { display: block; background: #f8f8fa; color: #444; text-decoration: none; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 600; margin-top: 10px; border: 1px solid #e5e5ea; position: relative; z-index: 20; }
+    .flip-btn { background: #f0f0f5; color: #555; border: none; padding: 10px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-top: 10px; font-weight: bold; width: 100%; position: relative; z-index: 20; }
     .wechat-img { width: 190px; height: 190px; border-radius: 10px; margin: 8px auto; object-fit: contain; }
-    .copy-box { background: #f4f4f9; padding: 10px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; display: inline-block; border: 1px dashed #ccc; }
+    .copy-box { background: #f4f4f9; padding: 10px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; display: inline-block; border: 1px dashed #ccc; position: relative; z-index: 20; }
+    #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
   </style>
 </head>
 <body>
+  <canvas id="confetti"></canvas>
   <div class="scene">
     <div class="card" id="card">
       <div class="card-face card-front">
+        <div class="glare" id="glare-front"></div>
         <div>
           <div id="txt-greeting" class="greeting">Hallo!</div>
           <h2 id="user-name">DEIN NAME</h2>
@@ -33,12 +37,13 @@
           <div id="live-status" class="status-badge">Status wird geladen...</div>
         </div>
         <div>
-          <a id="btn-save" class="btn-primary" href="me.vcf" onclick="celebrate()">Kontakt speichern</a>
+          <a id="btn-save" class="btn-primary" href="me.vcf" onclick="return celebrate(event)">Kontakt speichern</a>
           <a id="btn-meet" class="btn-secondary" href="#">📍 Treffpunkt-Notiz senden</a>
           <button id="btn-flip-front" class="flip-btn" onclick="flipCard()">📱 Schütteln oder tippen für WeChat ↻</button>
         </div>
       </div>
       <div class="card-face card-back">
+        <div class="glare" id="glare-back"></div>
         <div>
           <h3 style="margin: 5px 0;">WeChat Connect</h3>
           <img id="wechat-qr" class="wechat-img" src="wechat.jpg" alt="WeChat QR Code"><br>
@@ -51,7 +56,6 @@
       </div>
     </div>
   </div>
-
   <script>
     const CONFIG = {
       name: "Jens-Peter Lehmann",
@@ -66,7 +70,8 @@
     document.getElementById('wechat-id-text').innerText = CONFIG.wechatId;
     document.getElementById('wechat-qr').src = CONFIG.wechatImage;
 
-    const lang = (navigator.language || 'en').toLowerCase().startsWith('zh') ? 'zh' : ((navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' : 'en');
+    const ul = (navigator.language || 'en').toLowerCase();
+    const lang = ul.startsWith('zh') ? 'zh' : (ul.startsWith('de') ? 'de' : 'en');
     const I18N = {
       de: { g: "Schön, dass wir uns vernetzen!", s: "Kontakt speichern", sd: "✅ Gespeichert!", m: "📍 Treffpunkt-Notiz senden", ff: "📱 Schütteln oder tippen für WeChat ↻", fb: "↺ Zurück", cp: "✅ Kopiert!", st: ["☕ Wach & bereit", "🍜 Mittagspause", "🚀 Im Arbeitsmodus", "🍻 Feierabend", "😴 Schläft (WeChat!)"] },
       zh: { g: "你好! 很高兴认识你", s: "保存联系人", sd: "✅ 已保存!", m: "📍 发送邮件交换联系方式", ff: "📱 摇一摇或点击查看微信 ↻", fb: "↺ 返回", cp: "✅ 已复制!", st: ["☕ 精神饱满", "🍜 午休时间", "🚀 工作中", "🍻 下班时间", "😴 休息中 (请发微信!)"] },
@@ -83,10 +88,10 @@
 
     function updateStatus() {
       const now = new Date();
-      const timeStr = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' }).format(now);
+      const ts = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' }).format(now);
       const h = parseInt(new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: 'numeric', hour12: false }).format(now), 10);
-      const idx = (h >= 8 && h < 12) ? 0 : (h >= 12 && h < 14) ? 1 : (h >= 14 && h < 18) ? 2 : (h >= 18 && h < 22) ? 3 : 4;
-      document.getElementById('live-status').innerText = timeStr + " (DE) – " + t.st[idx];
+      const i = (h >= 8 && h < 12) ? 0 : (h >= 12 && h < 14) ? 1 : (h >= 14 && h < 18) ? 2 : (h >= 18 && h < 22) ? 3 : 4;
+      document.getElementById('live-status').innerText = ts + " (DE) – " + t.st[i];
     }
     updateStatus();
     setInterval(updateStatus, 60000);
@@ -101,10 +106,10 @@
     let lastShake = 0;
     function flipCard() {
       card.classList.toggle('is-flipped');
-      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-        DeviceMotionEvent.requestPermission().catch(() => {});
-      }
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') DeviceMotionEvent.requestPermission().catch(() => {});
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') DeviceOrientationEvent.requestPermission().catch(() => {});
     }
+
     window.addEventListener('devicemotion', e => {
       const a = e.accelerationIncludingGravity;
       if (a && (Math.abs(a.x) + Math.abs(a.y) + Math.abs(a.z)) > 32 && (Date.now() - lastShake) > 1200) {
@@ -113,10 +118,44 @@
       }
     });
 
-    function celebrate() {
+    function setGlare(x, y) {
+      const bg = "radial-gradient(circle at " + x + "% " + y + "%, rgba(255,255,255,0.85) 0%, rgba(255,140,60,0.18) 40%, transparent 75%)";
+      document.getElementById('glare-front').style.background = bg;
+      document.getElementById('glare-back').style.background = bg;
+    }
+
+    window.addEventListener('deviceorientation', e => {
+      if (e.gamma !== null && e.beta !== null) {
+        setGlare(Math.min(100, Math.max(0, 50 + e.gamma * 1.5)), Math.min(100, Math.max(0, 50 + (e.beta - 45) * 1.5)));
+      }
+    });
+
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      setGlare(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
+    });
+
+    function celebrate(e) {
+      e.preventDefault();
       const b = document.getElementById('btn-save');
       b.innerText = t.sd;
       setTimeout(() => { b.innerText = t.s; }, 3000);
+      const c = document.getElementById('confetti');
+      const ctx = c.getContext('2d');
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
+      const cols = ['#ff6600', '#ff944d', '#ffd6ba', '#333333'];
+      const pts = Array.from({ length: 60 }, () => ({ x: Math.random() * c.width, y: Math.random() * -c.height, s: Math.random() * 7 + 4, v: Math.random() * 4 + 3, col: cols[Math.floor(Math.random() * cols.length)] }));
+      let f = 0;
+      function loop() {
+        ctx.clearRect(0, 0, c.width, c.height);
+        pts.forEach(p => { ctx.fillStyle = p.col; ctx.fillRect(p.x, p.y, p.s, p.s); p.y += p.v; });
+        if (++f < 90) requestAnimationFrame(loop);
+        else ctx.clearRect(0, 0, c.width, c.height);
+      }
+      loop();
+      setTimeout(() => { window.location.href = 'me.vcf'; }, 400);
+      return false;
     }
   </script>
 </body>
